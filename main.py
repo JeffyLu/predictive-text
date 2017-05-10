@@ -4,6 +4,7 @@ import manage
 import time
 from db.models import Words
 from django.db import transaction
+from crawler.crawler import run_crawler
 
 @transaction.atomic
 def generate_words():
@@ -15,3 +16,4 @@ def generate_words():
 if __name__ == '__main__':
 
     #generate_words()
+    run_crawler(4)

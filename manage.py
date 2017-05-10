@@ -8,6 +8,7 @@ from django.conf import settings
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WORDS_PATH = os.path.join(BASE_DIR, 'data', 'words.txt')
+VOA_DIR = os.path.join(BASE_DIR, 'data', 'VOA')
 
 INSTALLED_APPS = [
     'db',
