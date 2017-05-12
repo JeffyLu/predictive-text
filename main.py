@@ -45,6 +45,6 @@ def stat_counts():
 
 if __name__ == '__main__':
 
-    generate_words()
-    #run_crawler(4)
-    stat_counts()
+    #generate_words()
+    run_crawler(4)
+    #stat_counts()

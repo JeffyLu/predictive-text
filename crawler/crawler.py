@@ -38,17 +38,12 @@ class VOACrawler:
                 re.S,
             )
         elif _type == 1:
-            data = re.findall(
-                r'<p>(.*?)</p>',
+            data = ''.join(re.findall(
+                r'<div id="content">(.*?)<div id="Bottom_VOA">',
                 resp,
                 re.S,
-            )
-            data = re.sub(
-                r'<.*?>',
-                ' ',
-                ''.join(data),
-                flags = re.S,
-            )
+            ))
+            data = re.sub(r'<.*?>', ' ', data, flags = re.S)
         else:
             raise Exception(" * unknown task type!")
         return data
@@ -72,6 +67,7 @@ class MultiThreadCrawler(threading.Thread):
         self.crawler = VOACrawler()
 
     def run(self):
+        cnt = 1
         while not self.task_queue.empty():
             task, _type = self.task_queue.get()
             try:
@@ -85,9 +81,14 @@ class MultiThreadCrawler(threading.Thread):
                 print("[SUCCESS] t%s: found %s news in page %s" % (
                     self.getName(), len(data), task))
             else:
-                filename = os.path.join(VOA_DIR, task.split('/')[-1][:-5])
+                _dir = os.path.join(VOA_DIR, self.getName()+str(cnt//1000))
+                if not os.path.exists(_dir):
+                    os.makedirs(_dir)
+                filename = os.path.join(_dir, task.split('/')[-1][:-5])
                 with open(filename, 'w+') as f:
                     f.write(data)
+                cnt += 1
+                print("-"*20, cnt)
                 print("[SUCCESS] t%s: saved %s" % (self.getName(), task))
 
 
@@ -106,7 +107,7 @@ def run_crawler(cpu = 1):
         raise Exception(" * faild to get tasks!")
     threads = []
     for i in range(cpu):
-        t = MultiThreadCrawler(i, task_queue)
+        t = MultiThreadCrawler(str(i), task_queue)
         t.daemon = True
         t.start()
         threads.append(t)
