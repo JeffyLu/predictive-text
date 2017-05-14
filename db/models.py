@@ -5,6 +5,7 @@ class Words(models.Model):
 
     value = models.CharField(
         max_length = 26,
+        unique = True,
     )
 
     counts = models.IntegerField(

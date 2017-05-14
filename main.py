@@ -1,6 +1,7 @@
 #coding:utf-8
 
 import os
+import gc
 import manage
 import time
 import queue
@@ -24,7 +25,7 @@ def _text_filter(text, _type):
         symbols.remove('.')
     for s in symbols:
         text = text.replace(s, ' ')
-    return text
+    return text.split() if _type == WORD else text.split('.')
 
 def _get_files():
     _dirs = os.listdir(manage.VOA_DIR)
@@ -34,20 +35,40 @@ def _get_files():
             os.path.join(manage.VOA_DIR, d))]
     return files
 
+def _text_generator(_type):
+    files = _get_files()
+    fcnt = 0
+    for fname in files:
+        fcnt += 1
+        print(fcnt, fname)
+        with open(os.path.join(manage.VOA_DIR, fname), 'r') as f:
+            text = _text_filter(f.read(), _type)
+            yield fcnt, text
+
+
+
 @transaction.atomic
 def generate_words(init = None):
     with open(manage.WORDS_PATH, 'r') as f:
-        cnt = 1
-        for word in f:
-            word = word.strip()
-            if len(word) > 25:
+        word_list = []
+        words = set(word.strip() for word in f)
+        print(' * generate words!')
+        for word in words:
+            if len(word) > 25 or len(word) < 1:
                 continue
             if init and word in init:
-                Words.objects.create(value = word.strip(), counts = init[word])
+                word_list.append(
+                    Words(value = word.strip(), counts = init[word])
+                )
+                #Words.objects.create(value = word.strip(), counts = init[word])
             else:
-                Words.objects.create(value = word.strip())
-            print(cnt, word)
-            cnt += 1
+                word_list.append(
+                    Words(value = word.strip())
+                )
+                #Words.objects.create(value = word.strip())
+        print(' * insert into database!')
+        Words.objects.bulk_create(word_list)
+        print(' * done!')
 
 
 class MultiThreadUpdate(threading.Thread):
@@ -71,15 +92,9 @@ class MultiThreadUpdate(threading.Thread):
             self.task_queue.task_done()
 
 def stat_counts():
-    files = _get_files()
     counter = Counter()
-    cnt = 1
-    for fname in files:
-        with open(os.path.join(manage.VOA_DIR, fname), 'r') as f:
-            print(cnt, 'loading %s...' % fname)
-            text = _text_filter(f.read(), WORD)
-            counter.update(text.split())
-            cnt += 1
+    for fcnt, text in _text_generator(WORD):
+        counter.update(text)
     generate_words(counter)
 #    task_queue = queue.Queue()
 #    with open(manage.WORDS_PATH, 'r') as f:
@@ -99,38 +114,43 @@ def stat_counts():
 
 @transaction.atomic
 def stat_relations():
-    files = _get_files()
     stat_list = []
-    for fname in files[:1]:
-        with open(os.path.join(manage.VOA_DIR, fname), 'r') as f:
-            text = _text_filter(f.read(), SENTENCE)
-            print(text)
-        for sentence in text.split('.'):
+    for fcnt, text in _text_generator(SENTENCE):
+        for sentence in text:
             words = sentence.split()
-            if len(words) < 2:
+            if len(words) < 1:
                 continue
             for i, w in enumerate(words[:-1]):
-                try:
-                    pw = Words.objects.get(value = w)
-                    nw = Words.objects.get(value = words[i+1])
-                    relation = Relations.objects.get(
-                        wid = pw,
-                        next_wid = nw,
-                    )
-                except:
-                    if pw and nw:
-                        relation = Relations.objects.create(
-                        wid = pw,
-                        next_wid = nw,
-                        )
-                    print(relation, pw, nw)
-                    continue
-                relation.counts += 1
-                print(relation, pw, nw)
+                stat_list.append((w, words[i+1]))
+    counter = Counter(stat_list)
+    del stat_list
+    ccnt = 1
+    with open(manage.WORDS_PATH, 'r') as f:
+        words = set(word.strip() for word in f)
+    for k, v in counter.items():
+        if k[0] in words and k[1] in words:
+            try:
+                wid = Words.objects.get(value = k[0])
+                next_wid = Words.objects.get(value = k[1])
+                Relations.objects.create(
+                    wid = wid,
+                    next_wid = next_wid,
+                    counts = v,
+                )
+            except:
+                pass
+        if ccnt % 10000 == 0:
+            print(ccnt, len(counter))
+        ccnt += 1
+    del counter
+    time.sleep(10)
+    print('done')
 
 if __name__ == '__main__':
 
     #generate_words()
     #run_crawler(4)
+    start = time.time()
     #stat_counts()
     stat_relations()
+    print(time.time()-start)
