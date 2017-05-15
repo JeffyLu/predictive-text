@@ -143,7 +143,6 @@ def stat_relations():
             print(ccnt, len(counter))
         ccnt += 1
     del counter
-    time.sleep(10)
     print('done')
 
 if __name__ == '__main__':

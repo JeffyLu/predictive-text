@@ -26,6 +26,7 @@ class Relations(models.Model):
         Words,
         on_delete = models.CASCADE,
         related_name = 'r_wid',
+        db_index = True,
     )
 
     next_wid = models.ForeignKey(
