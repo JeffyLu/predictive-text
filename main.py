@@ -14,7 +14,7 @@ from crawler.crawler import run_crawler
 
 WORD = 0
 SENTENCE = 1
-
+THREAD = 4
 
 def _text_filter(text, _type):
     symbols = ['\n', '\t', '.', '"', '?', '&nbsp;', ',', '&amp;', '(', ')',
@@ -45,6 +45,10 @@ def _text_generator(_type):
             text = _text_filter(f.read(), _type)
             yield fcnt, text
 
+def _get_words_set():
+    with open(manage.WORDS_PATH, 'r') as f:
+        words = set(word.strip() for word in f)
+        return words
 
 
 @transaction.atomic
@@ -91,26 +95,28 @@ class MultiThreadUpdate(threading.Thread):
                 self.getName(), self.task_queue.qsize()))
             self.task_queue.task_done()
 
-def stat_counts():
+
+def stat_counts(init = False):
     counter = Counter()
     for fcnt, text in _text_generator(WORD):
         counter.update(text)
-    generate_words(counter)
-#    task_queue = queue.Queue()
-#    with open(manage.WORDS_PATH, 'r') as f:
-#        words = ''.join(f)
-#        for k, v in counter.items():
-#            if k in words:
-#                task_queue.put((k, v))
-#    threads = []
-#    for i in range(4):
-#        t = MultiThreadUpdate(str(i), task_queue)
-#        t.daemon = True
-#        t.start()
-#        threads.append(t)
-#    for t in threads:
-#        t.join()
-#
+    if init:
+        generate_words(counter)
+        return
+    task_queue = queue.Queue()
+    words = _get_words_set()
+    for k, v in counter.items():
+        if k in words:
+            task_queue.put((k, v))
+    threads = []
+    for i in range(THREAD):
+        t = MultiThreadUpdate(str(i), task_queue)
+        t.daemon = True
+        t.start()
+        threads.append(t)
+    for t in threads:
+        t.join()
+
 
 @transaction.atomic
 def stat_relations():
@@ -125,8 +131,7 @@ def stat_relations():
     counter = Counter(stat_list)
     del stat_list
     ccnt = 1
-    with open(manage.WORDS_PATH, 'r') as f:
-        words = set(word.strip() for word in f)
+    words = _get_words_set()
     for k, v in counter.items():
         if k[0] in words and k[1] in words:
             try:

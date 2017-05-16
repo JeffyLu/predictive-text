@@ -47,57 +47,24 @@ class Relations(models.Model):
         return '%s->%s:%d' % (self.wid.value, self.next_wid.value, self.counts)
 
 
-class TopRelations(models.Model):
+class UserHabits(models.Model):
 
-    wid = models.ForeignKey(
-        Words,
-        on_delete = models.CASCADE,
-        related_name = 'tr_wid',
+    uid = models.IntegerField()
+
+    value = models.CharField(
+        max_length = 26,
     )
 
-    top1 = models.ForeignKey(
-        Words,
-        on_delete = models.CASCADE,
-        null = True,
-        blank = True,
-        related_name = 'tr_top1',
-    )
-
-    top2 = models.ForeignKey(
-        Words,
-        on_delete = models.CASCADE,
-        null = True,
-        blank = True,
-        related_name = 'tr_top2',
-    )
-
-    top3 = models.ForeignKey(
-        Words,
-        on_delete = models.CASCADE,
-        null = True,
-        blank = True,
-        related_name = 'tr_top3',
-    )
-
-    top4 = models.ForeignKey(
-        Words,
-        on_delete = models.CASCADE,
-        null = True,
-        blank = True,
-        related_name = 'tr_top4',
-    )
-
-    top5 = models.ForeignKey(
-        Words,
-        on_delete = models.CASCADE,
-        null = True,
-        blank = True,
-        related_name = 'tr_top5',
+    counts = models.IntegerField(
+        default = 0,
     )
 
     class Meta:
 
-        db_table = 'top_relations'
+        unique_together = ('value', 'uid')
+        db_table = 'user_habits'
 
     def __str__(self):
-        return '%s:%s' % (self.wid.value, self.top1.value)
+        return '[%d]%s:%d' % (self.uid, self.value, self.counts)
+
+

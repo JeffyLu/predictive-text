@@ -31,6 +31,10 @@ def auto_predict_word():
         print(results, time.time() - start)
 
 
+def test_user_habits():
+    pass
+
+
 if __name__ == '__main__':
 
     #auto_complete_word()
