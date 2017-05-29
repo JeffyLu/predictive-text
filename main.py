@@ -7,7 +7,7 @@ import time
 import queue
 import threading
 from collections import Counter
-from db.models import Words, Relations, TopRelations
+from db.models import Words, Relations
 from django.db import transaction
 from crawler.crawler import run_crawler
 

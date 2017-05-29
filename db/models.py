@@ -68,3 +68,23 @@ class UserHabits(models.Model):
         return '[%d]%s:%d' % (self.uid, self.value, self.counts)
 
 
+class DailyLanguages(models.Model):
+
+    wid = models.ForeignKey(
+        Words,
+        on_delete = models.CASCADE,
+        db_index = True,
+    )
+
+    next_words = models.CharField(
+        max_length = 50,
+    )
+
+    class Meta:
+
+        db_table = 'daily_languages'
+
+    def __str__(self):
+        return '%s %s' % (self.wid.value, self.next_words)
+
+
