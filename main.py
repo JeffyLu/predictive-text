@@ -153,8 +153,6 @@ def stat_relations():
 if __name__ == '__main__':
 
     #generate_words()
-    #run_crawler(4)
-    start = time.time()
-    #stat_counts()
+    run_crawler(4)
+    stat_counts()
     stat_relations()
-    print(time.time()-start)
