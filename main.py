@@ -1,7 +1,6 @@
 #coding:utf-8
 
 import os
-import gc
 import manage
 import time
 import queue
@@ -152,7 +151,7 @@ def stat_relations():
 
 if __name__ == '__main__':
 
-    #generate_words()
+    generate_words()
     run_crawler(4)
     stat_counts()
     stat_relations()
