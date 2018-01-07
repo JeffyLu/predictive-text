@@ -1,50 +1,9 @@
-#coding:utf-8
-
+#!/usr/bin/env python
 import os
 import sys
-import django
-from django.conf import settings
-
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-WORDS_PATH = os.path.join(BASE_DIR, 'data', 'words.txt')
-VOA_DIR = os.path.join(BASE_DIR, 'data', 'VOA')
-
-INSTALLED_APPS = [
-    'db',
-]
-
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
-
-DATABASES = {
-    'default': {
-        'ENGINE' : 'django.db.backends.mysql',
-        'NAME' : 'test',
-        'USER' : 'root',
-        'PASSWORD' : 'root',
-        'HOST' : 'localhost',
-        'PORT' : '3306',
-        'OPTIONS': {
-           'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-       }
-    }
-}
-
-settings.configure(
-    INSTALLED_APPS = INSTALLED_APPS,
-    DATABASES = DATABASES,
-)
-
-django.setup()
 
 if __name__ == "__main__":
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "predictive_text.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError:

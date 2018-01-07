@@ -1,6 +1,19 @@
-# encoding=utf-8
+import requests
 
-agents = [
+
+def get_html(url, retry=3, headers=None, encoding=None):
+    while retry:
+        try:
+            resp = requests.get(url, headers=headers)
+            if encoding:
+                resp.encoding = encoding
+                return resp.text
+        except (TimeoutError, ConnectionError):
+            retry -= 1
+    raise TimeoutError('timeout error')
+
+
+user_agents = [
     "Mozilla/5.0 (Linux; U; Android 2.3.6; en-us; Nexus S Build/GRK39F) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1",
     "Avant Browser/1.2.789rel1 (http://www.avantbrowser.com)",
     "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.0 Safari/532.5",
