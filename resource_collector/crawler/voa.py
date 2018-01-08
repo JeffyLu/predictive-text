@@ -32,6 +32,19 @@ class VOACrawler:
          for i in range(int(page.groups()[0]))]
         return task_queue
 
+    @property
+    def update_todays_article_queue(self):
+        html = get_html(self.url_root, retry=self.retry, headers=self.headers,
+                        encoding=self.encoding)
+        urls = re.findall(
+            r'href="(/VOA_Standard_English/[a-zA-Z0-9_-]*?.html)"', html, re.S)
+        task_queue = queue.Queue()
+        for url in urls:
+            task_queue.put(
+                (self.url_root + url, MultiThreadCrawler.TASK_TYPE_ARTICLE)
+            )
+        return task_queue
+
     def get_archiver_article_urls(self, page):
         url = self.url_standard.format(page)
         html = get_html(url, retry=self.retry, headers=self.headers,
@@ -48,9 +61,12 @@ class VOACrawler:
         return re.sub(r'<.*?>', ' ', ''.join(contents), flags=re.S)
 
 
-def run_crawler(cpu=1):
+def run_crawler(cpu=1, crawl_today=False):
     crawler = VOACrawler()
-    task_queue = crawler.standard_archiver_pages_task_queue
+    if crawl_today:
+        task_queue = crawler.update_todays_article_queue
+    else:
+        task_queue = crawler.standard_archiver_pages_task_queue
     threads = []
     for i in range(cpu):
         t = MultiThreadCrawler(crawler, task_queue)
