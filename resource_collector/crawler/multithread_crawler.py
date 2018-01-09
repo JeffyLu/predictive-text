@@ -41,5 +41,7 @@ class MultiThreadCrawler(threading.Thread):
                 urls = self.crawler.get_archiver_article_urls(task)
                 for url in urls:
                     self.task_queue.put((url, self.TASK_TYPE_ARTICLE))
+            self.task_queue.task_done()
 
-            print('remain: {}, task: {}'.format(self.task_queue.qsize(), task))
+            print('remain: {}, current: {}'.format(
+                self.task_queue.qsize(), task))
