@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_crontab',
     'resource_collector',
+    'predictive',
 ]
 
 MIDDLEWARE = [
