@@ -11,6 +11,9 @@ class Vocabulary(models.Model):
     def __str__(self):
         return '{}: {}'.format(self.word, self.frequency)
 
+    class Meta:
+        ordering = ['-frequency', 'word']
+
 
 class VocabularyRelation(models.Model):
 
@@ -24,11 +27,11 @@ class VocabularyRelation(models.Model):
     SHARDING_MODEL = {}
 
     def __str__(self):
-        return '{} {}: {}'.format(self.vocab.word, self.next_vocab.word,
-                                  self.frequency)
+        return '{} {}: {}'.format(self.vocab, self.next_vocab, self.frequency)
 
     class Meta:
         unique_together = ['vocab_id', 'next_vocab_id']
+        ordering = ['-frequency']
         abstract = True
 
     @property
@@ -47,6 +50,7 @@ class VocabularyRelation(models.Model):
         class Meta:
             db_table = 'predictive_vocabularyrelation_{}'.format(piece)
             unique_together = ['vocab_id', 'next_vocab_id']
+            ordering = ['-frequency']
         attrs = {'__module__': cls.__module__, 'Meta': Meta}
         class_name = 'VocabularyRelation_{}'.format(piece)
         if class_name not in cls.SHARDING_MODEL:
