@@ -136,4 +136,11 @@ CRONJOBS = [
         {},
         '>> %s/tmp/cronjobs/crawl_todays_article.log' % BASE_DIR,
     ),
+    (
+        '0 1 * * *',
+        'django.core.management.call_command',
+        ['analyze_articles'],
+        {},
+        '>> %s/tmp/cronjobs/analyze_articles.log' % BASE_DIR,
+    ),
 ]

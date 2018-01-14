@@ -14,13 +14,14 @@ class Vocabulary(models.Model):
 
 class VocabularyRelation(models.Model):
 
-    vocab_id = models.BigIntegerField(db_index=True)
+    vocab_id = models.BigIntegerField()
     next_vocab_id = models.BigIntegerField()
     frequency = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     SHARDING_PIECE = 4
+    SHARDING_MODEL = {}
 
     def __str__(self):
         return '{} {}: {}'.format(self.vocab.word, self.next_vocab.word,
@@ -47,7 +48,10 @@ class VocabularyRelation(models.Model):
             db_table = 'predictive_vocabularyrelation_{}'.format(piece)
             unique_together = ['vocab_id', 'next_vocab_id']
         attrs = {'__module__': cls.__module__, 'Meta': Meta}
-        return type('VocabularyRelation_{}'.format(piece), (cls, ), attrs)
+        class_name = 'VocabularyRelation_{}'.format(piece)
+        if class_name not in cls.SHARDING_MODEL:
+            cls.SHARDING_MODEL[class_name] = type(class_name, (cls, ), attrs)
+        return cls.SHARDING_MODEL[class_name]
 
 
 for i in range(VocabularyRelation.SHARDING_PIECE):
