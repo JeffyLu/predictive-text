@@ -20,7 +20,7 @@ class Command(BaseCommand):
             yield words, relations
 
     def handle(self, *args, **options):
-        task_num = options.get('articles', 100)
+        task_num = options.get('articles') or 100
         vocab_counter = Counter()
         vocab_relation_counter = Counter()
         articles = Article.objects.filter(is_used=False)[:task_num]
