@@ -1,0 +1,53 @@
+FORMAT: v1
+HOST: http://localhost/api/v2/predictive
+
+# Group Predictive-Text
+
+## Vocabulary Collection [/vocabularies/{?ipp,page,prefix}]
+
+### 根据前缀补全单词 [GET]
++ Parameters
+    + ipp: 7 (number, optional) - 每页提示个数，默认7个
+    + page: 1 (number, optional) - 当前页，默认1
+    + prefix: `th` (string, required) - 单词前缀
+
++ Response 200 (application/json)
+    + Attributes (VocabularyResponse)
+
+## Phrase Collection [/phrases/{?ipp,page,word}]
+
+### 根据单词提示短语 [GET]
++ Parameters
+    + ipp: 7 (number, optional) - 每页提示个数，默认7个
+    + page: 1 (number, optional) - 当前页，默认1
+    + word: `this` (string, required) - 单词
+
++ Response 200 (application/json)
+    + Attributes (PhraseResponse)
+
+
+# Data Structures
+
+## VocabularyRead
++ word: `this` (string) - 单词
+
+## PhraseRead
++ word: `this` (string) - 单词
+
+## BaseSuccessResponse
++ msg `success` (string)
++ data (object)
+
+## VocabularyResponse(BaseSuccessResponse)
++ data
+    + ipp: 7 (number)
+    + page: 1 (number)
+    + total: 4 (number)
+    + objects (array[VocabularyRead])
+
+## PhraseResponse(BaseSuccessResponse)
++ data
+    + ipp: 7 (number)
+    + page: 1 (number)
+    + total: 4 (number)
+    + objects (array[PhraseRead])
