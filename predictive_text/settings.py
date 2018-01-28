@@ -25,7 +25,7 @@ SECRET_KEY = 'l+38ezh8br+y8_-#iphf7xv4a5rzg&wl$5%5p27c*lk6@0m-xo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['jeffy.me']
 
 
 # Application definition
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_crontab',
+    'rest_framework',
     'resource_collector',
     'predictive',
 ]
@@ -51,6 +52,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'predictive.utils.PageNumberPaginationExt',
+    'DEFAULT_RENDERER_CLASSES': ('rest_framework.renderers.JSONRenderer',),
+    'PAGE_SIZE': 10,
+}
 
 ROOT_URLCONF = 'predictive_text.urls'
 

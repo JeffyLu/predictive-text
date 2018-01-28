@@ -27,7 +27,7 @@ class VocabularyRelation(models.Model):
     SHARDING_MODEL = {}
 
     def __str__(self):
-        return '{} {}: {}'.format(self.vocab, self.next_vocab, self.frequency)
+        return '{} {}: {}'.format(self.word, self.next_word, self.frequency)
 
     class Meta:
         unique_together = ['vocab_id', 'next_vocab_id']
@@ -35,18 +35,19 @@ class VocabularyRelation(models.Model):
         abstract = True
 
     @property
-    def vocab(self):
+    def word(self):
         vocab = Vocabulary.objects.filter(pk=self.vocab_id).first()
         return vocab.word if vocab else ''
 
     @property
-    def next_vocab(self):
+    def next_word(self):
         vocab = Vocabulary.objects.filter(pk=self.next_vocab_id).first()
         return vocab.word if vocab else ''
 
     @classmethod
     def get_sharding_model(cls, sharding_key):
         piece = sharding_key % cls.SHARDING_PIECE
+
         class Meta:
             db_table = 'predictive_vocabularyrelation_{}'.format(piece)
             unique_together = ['vocab_id', 'next_vocab_id']
