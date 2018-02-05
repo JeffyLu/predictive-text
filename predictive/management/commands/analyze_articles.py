@@ -1,5 +1,7 @@
 import re
 import nltk
+from django.core.cache import cache
+from predictive.cache_keys import key_of_vocabulary, key_of_relation
 from django.db.models import F
 from collections import Counter
 from django.core.management.base import BaseCommand
@@ -33,23 +35,34 @@ class Command(BaseCommand):
 
         vocab_id_dict = {}
         for k, v in vocab_counter.items():
-            try:
-                vocab = Vocabulary.objects.get(word=k)
-                vocab.frequency = F('frequency') + v
-                vocab.save()
-                vocab_id_dict[k] = vocab.pk
-            except Vocabulary.DoesNotExist:
-                continue
+            key = key_of_vocabulary(k)
+            vocab = cache.get(key)
+            if not vocab:
+                try:
+                    vocab = Vocabulary.objects.get(word=k)
+                except Vocabulary.DoesNotExist:
+                    continue
+            vocab.frequency = F('frequency') + v
+            vocab.save()
+            cache.set(key, vocab)
+            vocab_id_dict[k] = vocab.pk
+
         for k, v in vocab_relation_counter.items():
             vocab_id = vocab_id_dict.get(k[0])
             next_vocab_id = vocab_id_dict.get(k[1])
             if not all([vocab_id, next_vocab_id]):
                 continue
-            model = VocabularyRelation.get_sharding_model(vocab_id)
-            model.objects.update_or_create(
-                vocab_id=vocab_id, next_vocab_id=next_vocab_id,
-                defaults={'frequency': v})
+            key = key_of_relation(vocab_id, next_vocab_id)
+            relation = cache.get(key)
+            if not relation:
+                model = VocabularyRelation.get_sharding_model(vocab_id)
+                relation, _ = model.objects.update_or_create(
+                    vocab_id=vocab_id, next_vocab_id=next_vocab_id,
+                    defaults={'frequency': v})
+            else:
+                relation.frequency = F('frequency') + v
+                relation.save()
+            cache.set(key, relation)
 
         print('tasks: {}, vocabs: {}, relations: {}'.format(
             task_num, len(vocab_counter), len(vocab_relation_counter)))
-
