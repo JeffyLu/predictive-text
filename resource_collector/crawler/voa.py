@@ -1,8 +1,6 @@
 import re
 import queue
 import random
-import requests
-import threading
 from resource_collector.crawler.utils import user_agents, get_html
 from resource_collector.crawler.multithread_crawler import MultiThreadCrawler
 
