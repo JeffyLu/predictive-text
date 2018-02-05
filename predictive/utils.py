@@ -22,6 +22,10 @@ class PageNumberPaginationExt(PageNumberPagination):
         ]))
 
 
+MAX_SIZE_OF_QUERYSET = (PageNumberPaginationExt.max_page *
+                        PageNumberPaginationExt.max_page_size)
+
+
 def get_data(request):
     if request.method == 'GET':
         data = request.GET
