@@ -2,13 +2,13 @@
 
 - - -
 
-##### 环境依赖
+### 环境依赖
 - MySQL
 - Redis
 - Python3
 
 
-##### 使用方法
+### 使用方法
 在[settings.py](predictive_text/settings.py)中修改数据库和缓存的配置信息，然后装pip包。
 ```
 $ pip3 install -r requirements.txt
@@ -32,7 +32,7 @@ $ python3 manage.py runserver
 ```
 
 
-##### API文档
+### API文档
 [文档](api.apib)是基于APIBlueprint语法写的，可以使用[aglio](https://github.com/danielgtaylor/aglio)来渲染。
 ```
 $ aglio -i api.apib -s
@@ -41,5 +41,5 @@ $ aglio -i api.apib -s
 ![效果](https://user-images.githubusercontent.com/16357973/35916588-d39062ee-0c45-11e8-9d1c-1d87936e73be.png)
 
 
-##### TODO
+### TODO
 - [ ] 增加前端界面
