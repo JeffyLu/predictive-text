@@ -7,7 +7,7 @@ SECRET_KEY = 'l+38ezh8br+y8_-#iphf7xv4a5rzg&wl$5%5p27c*lk6@0m-xo'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['jeffy.me']
+ALLOWED_HOSTS = ['jeffy.me', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.auth',

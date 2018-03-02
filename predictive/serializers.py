@@ -6,11 +6,11 @@ class VocabularySerializer(ModelSerializer):
 
     class Meta:
         model = Vocabulary
-        fields = ['word', 'frequency']
+        fields = ['id', 'word', 'frequency']
 
 
 class PhraseSerializer(ModelSerializer):
 
     class Meta:
         model = VocabularyRelation.get_sharding_model(1)
-        fields = ['word', 'next_word', 'frequency']
+        fields = ['id', 'word', 'next_word', 'frequency']

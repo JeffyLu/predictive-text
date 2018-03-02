@@ -24,3 +24,13 @@ def key_of_vocabulary_queryset(prefix):
 @apply_prefix
 def key_of_phrase_queryset(word):
     return word
+
+
+@apply_prefix
+def key_of_user_vocabulary(ip):
+    return ip
+
+
+@apply_prefix
+def key_of_user_relation(ip):
+    return ip
