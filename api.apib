@@ -3,53 +3,75 @@ HOST: http://localhost/api/v1/predictive
 
 # Group Predictive-Text
 
-## Vocabulary Collection [/vocabularies/{?ipp,page,prefix}]
+## Vocabulary Collection [/vocabularies/{?ipp,page,prefix,user_mode}]
 
 ### 根据前缀补全单词 [GET]
 + Parameters
     + ipp: 7 (number, optional) - 每页提示个数，默认7个
     + page: 1 (number, optional) - 当前页，默认1
     + prefix: `th` (string, required) - 单词前缀
+    + user_mode: 1 (number, optional) - 开启用户个性化提示
 
 + Response 200 (application/json)
     + Attributes (VocabularyResponse)
 
-## Phrase Collection [/phrases/{?ipp,page,word}]
+## Vocabulary [/vocabularies/{id}/]
+
+### 更新用户数据 [PUT]
++ Parameters
+    + id: 1 (number, required) - 单词id
+
++ Response 200 (application/json)
+    + Attributes (VocabularyRead)
+
+
+## Phrase Collection [/phrases/{?ipp,page,word,user_mode}]
 
 ### 根据单词提示短语 [GET]
 + Parameters
     + ipp: 7 (number, optional) - 每页提示个数，默认7个
     + page: 1 (number, optional) - 当前页，默认1
     + word: `this` (string, required) - 单词
+    + user_mode: 1 (number, optional) - 开启用户个性化提示
 
 + Response 200 (application/json)
     + Attributes (PhraseResponse)
+
+## Phrase [/phrases/{id}/{?vocab_id}]
+
+### 更新用户数据 [PUT]
++ Parameters
+    + id: 1 (number, required) - 短语id
+
++ Request (application/json)
+    + Attributes
+        + vocab_id: 1 (number, required) - 短语的第一个单词id
+
++ Response 200 (application/json)
+    + Attributes (PhraseRead)
 
 
 # Data Structures
 
 ## VocabularyRead
++ id: 1 (number)
 + word: `this` (string) - 单词
 + frequency: 1029 (number) - 频率
 
 ## PhraseRead
++ id: 1 (number)
 + word: `this` (string) - 单词
++ next_word: `is` (string) - 补全短语
 + frequency: 1029 (number) - 频率
 
-## BaseSuccessResponse
-+ msg `success` (string)
-+ data (object)
+## VocabularyResponse
++ ipp: 7 (number)
++ page: 1 (number)
++ total: 4 (number)
++ objects (array[VocabularyRead])
 
-## VocabularyResponse(BaseSuccessResponse)
-+ data
-    + ipp: 7 (number)
-    + page: 1 (number)
-    + total: 4 (number)
-    + objects (array[VocabularyRead])
-
-## PhraseResponse(BaseSuccessResponse)
-+ data
-    + ipp: 7 (number)
-    + page: 1 (number)
-    + total: 4 (number)
-    + objects (array[PhraseRead])
+## PhraseResponse
++ ipp: 7 (number)
++ page: 1 (number)
++ total: 4 (number)
++ objects (array[PhraseRead])

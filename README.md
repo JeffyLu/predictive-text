@@ -38,7 +38,7 @@ $ python3 manage.py runserver
 $ aglio -i api.apib -s
 ```
 访问```localhost:3000```效果如下：
-![效果](https://user-images.githubusercontent.com/16357973/35916588-d39062ee-0c45-11e8-9d1c-1d87936e73be.png)
+![效果](https://user-images.githubusercontent.com/16357973/36898984-19157f6a-1e58-11e8-9f6d-58a18c51428f.png)
 
 
 ### TODO
