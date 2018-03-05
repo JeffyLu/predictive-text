@@ -58,6 +58,11 @@ class VocabularyRelation(models.Model):
             cls.SHARDING_MODEL[class_name] = type(class_name, (cls, ), attrs)
         return cls.SHARDING_MODEL[class_name]
 
+    @classmethod
+    def count(cls):
+        return sum(cls.get_sharding_model(i).objects.count()
+                   for i in range(cls.SHARDING_PIECE))
+
 
 for i in range(VocabularyRelation.SHARDING_PIECE):
     VocabularyRelation.get_sharding_model(i)

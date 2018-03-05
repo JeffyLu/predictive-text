@@ -2,7 +2,6 @@ import re
 import nltk
 from django.core.cache import cache
 from predictive.cache_keys import key_of_vocabulary, key_of_relation
-from django.db.models import F
 from collections import Counter
 from django.core.management.base import BaseCommand
 from resource_collector.models import Article
@@ -42,7 +41,7 @@ class Command(BaseCommand):
                     vocab = Vocabulary.objects.get(word=k)
                 except Vocabulary.DoesNotExist:
                     continue
-            vocab.frequency = F('frequency') + v
+            vocab.frequency = vocab.frequency + v
             vocab.save()
             cache.set(key, vocab)
             vocab_id_dict[k] = vocab.pk
@@ -60,7 +59,7 @@ class Command(BaseCommand):
                     vocab_id=vocab_id, next_vocab_id=next_vocab_id,
                     defaults={'frequency': v})
             else:
-                relation.frequency = F('frequency') + v
+                relation.frequency = relation.frequency + v
                 relation.save()
             cache.set(key, relation)
 
