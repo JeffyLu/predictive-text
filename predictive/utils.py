@@ -47,3 +47,18 @@ def get_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+
+def get_word_process_method(string):
+    if not string:
+        return None
+
+    if string.istitle():
+        _word_process_method = str.title
+    elif string.isupper():
+        _word_process_method = str.upper
+    elif string[0].isupper():
+        _word_process_method = str.title
+    else:
+        _word_process_method = None
+    return _word_process_method

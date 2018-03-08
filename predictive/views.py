@@ -15,14 +15,19 @@ class VocabularyViewSet(viewsets.ModelViewSet):
     def list(self, request):
         data = u.get_data(request)
         prefix = data.get('prefix', '')
+        _word_process_method = u.get_word_process_method(prefix)
         key = cache_keys.key_of_vocabulary_queryset(prefix)
         self.queryset = cache.get(key)
         if not self.queryset:
             self.queryset = list(Vocabulary.objects.filter(
-                word__startswith=prefix)[:u.MAX_SIZE_OF_QUERYSET])
+                word__startswith=prefix.lower())[:u.MAX_SIZE_OF_QUERYSET])
             cache.set(key, self.queryset)
         if not data.get('user_mode') == '1':
-            return super().list(request)
+            resp = super().list(request)
+            if _word_process_method:
+                for obj in resp.data['objects']:
+                    obj['word'] = _word_process_method(obj['word'])
+            return resp
 
         user_vocab_key = cache_keys.key_of_user_vocabulary(u.get_ip(request))
         user_vocab_ids = cache.get(user_vocab_key, [])
@@ -36,7 +41,11 @@ class VocabularyViewSet(viewsets.ModelViewSet):
                 vocabs.append(v)
         self.queryset = [user_vocabs[k] for k in
                          sorted(user_vocabs.keys(), reverse=True)] + vocabs
-        return super().list(request)
+        resp = super().list(request)
+        if _word_process_method:
+            for obj in resp.data['objects']:
+                obj['word'] = _word_process_method(obj['word'])
+        return resp
 
     def update(self, request, pk):
         pk = int(pk)
@@ -66,7 +75,7 @@ class PhraseViewSet(viewsets.ModelViewSet):
         key = cache_keys.key_of_phrase_queryset(word)
         self.queryset = cache.get(key)
         if not self.queryset:
-            vocab = Vocabulary.objects.filter(word=word).first()
+            vocab = Vocabulary.objects.filter(word=word.lower()).first()
             if vocab:
                 model = VocabularyRelation.get_sharding_model(vocab.pk)
                 self.queryset = list(model.objects.filter(vocab_id=vocab.pk))

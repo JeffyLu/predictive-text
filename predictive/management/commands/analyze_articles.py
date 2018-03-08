@@ -16,6 +16,7 @@ class Command(BaseCommand):
     def analyze(self, article_content):
         sents = nltk.sent_tokenize(article_content)
         for sent in sents:
+            sent = sent.lower()
             words = re.findall(r'[0-9a-zA-Z\']+', sent)
             relations = [(words[w-1], words[w]) for w in range(1, len(words))]
             yield words, relations
