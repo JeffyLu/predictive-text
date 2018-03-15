@@ -4,3 +4,4 @@ requests==2.18.4
 django-crontab==0.7.1
 djangorestframework==3.7.7
 django-redis==4.8.0
+django-cors-headers==2.2.0

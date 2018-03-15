@@ -7,12 +7,15 @@ SECRET_KEY = 'l+38ezh8br+y8_-#iphf7xv4a5rzg&wl$5%5p27c*lk6@0m-xo'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['jeffy.me', 'localhost']
+ALLOWED_HOSTS = ['jeffy.me', 'localhost', '127.0.0.1']
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'corsheaders',
     'django_crontab',
     'rest_framework',
     'resource_collector',
@@ -22,6 +25,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
