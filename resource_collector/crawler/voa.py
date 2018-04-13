@@ -1,6 +1,7 @@
 import re
 import queue
 import random
+from django.utils import timezone
 from resource_collector.crawler.utils import user_agents, get_html
 from resource_collector.crawler.multithread_crawler import MultiThreadCrawler
 
@@ -62,6 +63,7 @@ class VOACrawler:
 def run_crawler(cpu=1, crawl_today=False):
     crawler = VOACrawler()
     if crawl_today:
+        print(timezone.now())
         task_queue = crawler.update_todays_article_queue
     else:
         task_queue = crawler.standard_archiver_pages_task_queue

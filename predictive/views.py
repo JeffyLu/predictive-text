@@ -22,6 +22,7 @@ class VocabularyViewSet(viewsets.ModelViewSet):
             self.queryset = list(Vocabulary.objects.filter(
                 word__startswith=prefix.lower())[:u.MAX_SIZE_OF_QUERYSET])
             cache.set(key, self.queryset)
+
         if not data.get('user_mode') == '1':
             resp = super().list(request)
             if _word_process_method:
@@ -72,17 +73,7 @@ class PhraseViewSet(viewsets.ModelViewSet):
     def list(self, request):
         data = u.get_data(request)
         word = data.get('word')
-        key = cache_keys.key_of_phrase_queryset(word)
-        self.queryset = cache.get(key)
-        if not self.queryset:
-            vocab = Vocabulary.objects.filter(word=word.lower()).first()
-            if vocab:
-                model = VocabularyRelation.get_sharding_model(vocab.pk)
-                self.queryset = list(model.objects.filter(vocab_id=vocab.pk))
-            else:
-                self.queryset = []
-
-            cache.set(key, self.queryset[:u.MAX_SIZE_OF_QUERYSET])
+        self.queryset = u.get_phrase_queryset(word)
         if not data.get('user_mode') == '1':
             return super().list(request)
 
