@@ -90,3 +90,18 @@ def get_vocab_by_word(word):
     if not vocab:
         vocab = Vocabulary.objects.filter(word=word).first()
     return vocab
+
+
+def sort_queryset_by_lru_cache(queryset, key):
+    ids = cache.get(key, [])
+    sort_index = {ids[i]: i for i in range(len(ids))}
+    cached_objs = {}
+    objs = []
+    for obj in queryset:
+        if obj.pk in sort_index:
+            cached_objs[sort_index[obj.pk]] = obj
+        else:
+            objs.append(obj)
+    sorted_queryset = [cached_objs[k] for k in
+                       sorted(cached_objs.keys(), reverse=True)] + objs
+    return sorted_queryset

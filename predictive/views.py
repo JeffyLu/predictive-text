@@ -31,17 +31,8 @@ class VocabularyViewSet(viewsets.ModelViewSet):
             return resp
 
         user_vocab_key = cache_keys.key_of_user_vocabulary(u.get_ip(request))
-        user_vocab_ids = cache.get(user_vocab_key, [])
-        sort_index = {user_vocab_ids[i]: i for i in range(len(user_vocab_ids))}
-        user_vocabs = {}
-        vocabs = []
-        for v in self.queryset:
-            if v.pk in sort_index:
-                user_vocabs[sort_index[v.pk]] = v
-            else:
-                vocabs.append(v)
-        self.queryset = [user_vocabs[k] for k in
-                         sorted(user_vocabs.keys(), reverse=True)] + vocabs
+        self.queryset = u.sort_queryset_by_lru_cache(self.queryset,
+                                                     user_vocab_key)
         resp = super().list(request)
         if _word_process_method:
             for obj in resp.data['objects']:
@@ -78,18 +69,8 @@ class PhraseViewSet(viewsets.ModelViewSet):
             return super().list(request)
 
         user_relation_key = cache_keys.key_of_user_relation(u.get_ip(request))
-        user_relation_ids = cache.get(user_relation_key, [])
-        sort_index = {user_relation_ids[i]: i for i in
-                      range(len(user_relation_ids))}
-        user_relations = {}
-        relations = []
-        for r in self.queryset:
-            if r.pk in sort_index:
-                user_relations[sort_index[r.pk]] = r
-            else:
-                relations.append(r)
-        self.queryset = [user_relations[k] for k in sorted(
-            user_relations.keys(), reverse=True)] + relations
+        self.queryset = u.sort_queryset_by_lru_cache(self.queryset,
+                                                     user_relation_key)
         return super().list(request)
 
     def update(self, request, pk):
